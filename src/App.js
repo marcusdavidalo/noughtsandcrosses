@@ -1,112 +1,148 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import io from "socket.io-client";
-import "./App.css";
 
-function App() {
-  const [board, setBoard] = useState(Array(9).fill(null));
-  const [statusMessage, setStatusMessage] = useState("");
-  const [playerSymbol, setPlayerSymbol] = useState(null);
+const API_BASE_URL = "http://ttcnc.onrender.com/api";
+const socket = io(API_BASE_URL);
+
+const App = () => {
+  const [board, setBoard] = useState(
+    Array(3)
+      .fill(null)
+      .map(() => Array(3).fill(""))
+  );
+  const [currentPlayer, setCurrentPlayer] = useState("");
   const [playerName, setPlayerName] = useState("");
-  const [opponentName, setOpponentName] = useState("");
-  const [socket] = useState(() => io("https://ttcnc.onrender.com/"));
+  const [winner, setWinner] = useState(null);
+  const [message, setMessage] = useState("");
 
-  function handleJoin() {
-    socket.emit("join", { name: playerName });
-  }
+  useEffect(() => {
+    socket.on("boardUpdate", ({ board: updatedBoard, currentPlayer }) => {
+      console.log("Received board update:", updatedBoard);
+      setBoard(updatedBoard);
+      setCurrentPlayer(currentPlayer);
+    });
 
-  function handleClick(index) {
-    if (!playerSymbol || board[index]) return;
-    const newBoard = [...board];
-    newBoard[index] = playerSymbol;
-    setBoard(newBoard);
-    socket.emit("move", { board: newBoard });
-  }
-
-  function handleReset() {
-    setBoard(Array(9).fill(null));
-    setStatusMessage("");
-    setPlayerSymbol(null);
-    setOpponentName("");
-    socket.emit("reset");
-  }
-
-  function renderCell(index) {
-    return (
-      <button
-        className="w-16 h-16 border border-gray-400"
-        onClick={() => handleClick(index)}
-      >
-        {board[index]}
-      </button>
-    );
-  }
-
-  function renderStatus() {
-    return statusMessage;
-  }
-
-  socket.on("message", (message) => {
-    switch (message.type) {
-      case "waiting":
-        setStatusMessage("Waiting for another player...");
-        break;
-      case "game_start":
-        setPlayerSymbol(message.symbol);
-        setOpponentName(message.opponent);
-        setStatusMessage(
-          `You are playing as ${message.symbol} against ${message.opponent}`
-        );
-        break;
-      case "board_state":
-        setBoard(message.board);
-        break;
-      case "game_over":
-        if (message.winner) {
-          setStatusMessage(`Game over. Winner: ${message.winner}`);
-        } else {
-          setStatusMessage("Game over. It's a draw!");
-        }
-        break;
-      default:
-        break;
+    const savedName = localStorage.getItem("playerName");
+    if (savedName) {
+      setPlayerName(savedName);
+    } else {
+      const name = prompt("Please enter your name:");
+      setPlayerName(name || "");
+      localStorage.setItem("playerName", name || "");
     }
-  });
+  }, []);
 
-  if (!playerName) {
+  const resetGame = async () => {
+    try {
+      await axios.post(`${API_BASE_URL}/reset`);
+      setBoard(Array(3).fill(Array(3).fill("")));
+      setCurrentPlayer("");
+      setWinner(null); // Set winner to null
+      setMessage("");
+    } catch (error) {
+      console.error("Error resetting the game", error);
+    }
+  };
+
+  const makeMove = async (row, col) => {
+    try {
+      if (board[row][col] === "" && !winner && playerName) {
+        const response = await axios.post(`${API_BASE_URL}/move`, { row, col });
+        const {
+          board: updatedBoard,
+          currentPlayer,
+          winner,
+          message,
+        } = response.data;
+
+        if (updatedBoard && Array.isArray(updatedBoard)) {
+          setBoard(updatedBoard);
+        }
+
+        setCurrentPlayer(currentPlayer);
+
+        if (winner) {
+          if (winner === "draw") {
+            setMessage(message);
+          } else {
+            // Update the board state with the winning move
+            setBoard(updatedBoard);
+            setWinner(winner);
+            setMessage(message);
+          }
+        }
+
+        // Emit the board update with currentPlayer and winner
+        socket.emit("boardUpdate", {
+          board: updatedBoard,
+          currentPlayer,
+          winner,
+        });
+      } else {
+        // Emit the board update even if the move is invalid or there is already a winner
+        socket.emit("boardUpdate", {
+          board,
+          currentPlayer,
+          winner,
+        });
+      }
+    } catch (error) {
+      console.error("Error making the move", error);
+    }
+  };
+
+  const renderCell = (row, col) => {
+    if (!board || !Array.isArray(board[row]) || board[row][col] === undefined) {
+      console.log("Invalid board state:", board);
+      return null;
+    }
+
     return (
-      <div className="flex flex-col justify-center h-screen items-center mt-8">
-        <input
-          className="mb-4 px-4 py-2 border border-gray-400 rounded"
-          placeholder="Enter your name"
-          onChange={(e) => setPlayerName(e.target.value)}
-        />
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-          onClick={handleJoin}
-          disabled={!playerName}
-        >
-          Join
-        </button>
+      <div
+        key={row * 3 + col}
+        className="h-16 w-16 border border-gray-300 flex items-center justify-center text-3xl font-bold cursor-pointer bg-white"
+        onClick={() => makeMove(row, col)}
+      >
+        {board[row][col]}
       </div>
     );
-  }
+  };
 
   return (
-    <div className="flex flex-col justify-center h-screen items-center mt-8">
-      <div className="mb-4 text-2xl font-bold">{renderStatus()}</div>
-      <div className="grid grid-cols-3 gap-4">
-        {board.map((cell, index) => (
-          <div key={index}>{renderCell(index)}</div>
-        ))}
+    <div className="flex flex-col justify-center h-screen items-center container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-4">Tic-Tac-Toe</h1>
+      <div className="flex">
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {board.map((row, rowIndex) =>
+            row.map((cell, colIndex) => renderCell(rowIndex, colIndex))
+          )}
+        </div>
       </div>
-      <button
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-        onClick={handleReset}
-      >
-        Reset
-      </button>
+      {winner !== null || winner === "draw" ? (
+        <div className="mb-4">
+          <p className="font-bold">{message}</p>
+          {winner !== "draw" ? (
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mt-2"
+              onClick={resetGame}
+            >
+              Play Again
+            </button>
+          ) : (
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mt-2"
+              onClick={resetGame}
+            >
+              Play Again
+            </button>
+          )}
+        </div>
+      ) : playerName ? (
+        <p className="font-bold">{currentPlayer}'s Turn</p>
+      ) : null}
     </div>
   );
-}
+};
 
 export default App;
