@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 
-const API_BASE_URL = "http://ttcnc.onrender.com/api";
+const API_BASE_URL = "https://ttcnc.onrender.com/api";
 const socket = io(API_BASE_URL);
 
 socket.on("connect", () => {
