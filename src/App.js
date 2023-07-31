@@ -2,8 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 
-const API_BASE_URL = "https://ttcnc.onrender.com/api";
+const API_BASE_URL = "http://ttcnc.onrender.com/api";
 const socket = io(API_BASE_URL);
+
+socket.on("connect", () => {
+  console.log("Connected to server:", socket.id);
+});
 
 const App = () => {
   const [board, setBoard] = useState(
@@ -38,7 +42,7 @@ const App = () => {
       await axios.post(`${API_BASE_URL}/reset`);
       setBoard(Array(3).fill(Array(3).fill("")));
       setCurrentPlayer("");
-      setWinner(null); // Set winner to null
+      setWinner(null);
       setMessage("");
     } catch (error) {
       console.error("Error resetting the game", error);
@@ -65,27 +69,13 @@ const App = () => {
         if (winner) {
           if (winner === "draw") {
             setMessage(message);
+            setWinner("draw");
           } else {
-            // Update the board state with the winning move
             setBoard(updatedBoard);
             setWinner(winner);
             setMessage(message);
           }
         }
-
-        // Emit the board update with currentPlayer and winner
-        socket.emit("boardUpdate", {
-          board: updatedBoard,
-          currentPlayer,
-          winner,
-        });
-      } else {
-        // Emit the board update even if the move is invalid or there is already a winner
-        socket.emit("boardUpdate", {
-          board,
-          currentPlayer,
-          winner,
-        });
       }
     } catch (error) {
       console.error("Error making the move", error);
@@ -122,21 +112,12 @@ const App = () => {
       {winner !== null || winner === "draw" ? (
         <div className="mb-4">
           <p className="font-bold">{message}</p>
-          {winner !== "draw" ? (
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mt-2"
-              onClick={resetGame}
-            >
-              Play Again
-            </button>
-          ) : (
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mt-2"
-              onClick={resetGame}
-            >
-              Play Again
-            </button>
-          )}
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mt-2"
+            onClick={resetGame}
+          >
+            Play Again
+          </button>
         </div>
       ) : playerName ? (
         <p className="font-bold">{currentPlayer}'s Turn</p>
