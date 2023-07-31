@@ -8,7 +8,7 @@ function App() {
   const [playerSymbol, setPlayerSymbol] = useState(null);
   const [playerName, setPlayerName] = useState("");
   const [opponentName, setOpponentName] = useState("");
-  const [socket] = useState(() => io("http://localhost:5000"));
+  const [socket] = useState(() => io("https://ttcnc.onrender.com/"));
 
   function handleJoin() {
     socket.emit("join", { name: playerName });
