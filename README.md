@@ -1,70 +1,58 @@
-# Getting Started with Create React App
+# Noughts and Crosses
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a simple Tic-Tac-Toe game built using NodeJS for the backend and React.js for the frontend.
 
-## Available Scripts
+## Table of Contents
 
-In the project directory, you can run:
+- Project Structure
+- Installation Instructions
+- Execution Instructions
+- Compromises and Future Improvements
+- Error Handling
+- Code Formatting and Comments
+- Simplicity
+- Deployment
 
-### `npm start`
+## Project Structure
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The project is divided into two main parts: the frontend and the backend. The frontend code is located in the noughtsandcrosses repository, while the backend code is located in the noughtsandcrosses-backend repository.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+The frontend code is organized into several components, including the main `App` component which contains the game logic and state management. The `App` component uses `useState` and `useEffect` hooks from React to manage the game state and handle updates from the backend server.
 
-### `npm test`
+The backend code is responsible for managing the game state and handling requests from the frontend. It uses NodeJS and Express to create a simple REST API for making moves and resetting the game.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Installation Instructions
 
-### `npm run build`
+1. Clone the frontend repository by running `git clone https://github.com/marcusdavidalo/noughtsandcrosses.git` in your terminal.
+2. Navigate to the cloned repository by running `cd noughtsandcrosses`.
+3. Install all the necessary dependencies by running `npm install`.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Execution Instructions
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Start the frontend server by running `npm start` in the `noughtsandcrosses` directory.
+2. The game should now be accessible at `http://localhost:3000`.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Compromises and Future Improvements
 
-### `npm run eject`
+In building this project, I made some compromises in order to meet the requirements within the given time frame. For example, one issue that I encountered was that the game does not update in real-time, and I am still working on finding a solution to this problem.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+In future iterations of this project, I would like to continue improving its functionality and user experience. Some potential improvements could include adding additional features such as player accounts, leaderboards, or multiplayer functionality, might include this in my portfolio.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Error Handling
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+There may be some error cases that are currently unhandled in this project. These could potentially impact its functionality. For example, if there are issues with the connection to the backend server, this could cause problems with updating the game state.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+In future iterations, it would be beneficial to add more robust error handling to ensure that any potential issues are handled gracefully.
 
-## Learn More
+## Code Formatting and Comments
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The code is well-formatted and commented to provide clarity on its functionality.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Simplicity
 
-### Code Splitting
+The focus of this project was on simplicity, both in terms of its design and implementation. The game mechanics are straightforward and should be easy enough to understand, while the user interface is clean and uncluttered.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Deployment
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The game is deployed at https://nacttcnc.vercel.app/. It uses Vercel for hosting and continuous deployment.
+The backend is deployed at https://ttcnc.onrender.com/api. It uses Render as a Web Service type of deployment.
