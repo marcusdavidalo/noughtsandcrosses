@@ -44,10 +44,6 @@ There may be some error cases that are currently unhandled in this project. Thes
 
 In future iterations, it would be beneficial to add more robust error handling to ensure that any potential issues are handled gracefully.
 
-## Code Formatting and Comments
-
-The code is well-formatted and commented to provide clarity on its functionality.
-
 ## Simplicity
 
 The focus of this project was on simplicity, both in terms of its design and implementation. The game mechanics are straightforward and should be easy enough to understand, while the user interface is clean and uncluttered.
