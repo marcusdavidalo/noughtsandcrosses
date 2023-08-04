@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 
-const API_BASE_URL = "https://ttcnc.onrender.com/api";
+const API_BASE_URL = "http://localhost:5000/api";
 const socket = io(API_BASE_URL);
 
 socket.on("connect", () => {
@@ -35,6 +35,22 @@ const App = () => {
       setPlayerName(name || "");
       localStorage.setItem("playerName", name || "");
     }
+
+    async function fetchState() {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/state`);
+        const { board: updatedBoard, currentPlayer } = response.data;
+        setBoard(updatedBoard);
+        setCurrentPlayer(currentPlayer);
+      } catch (error) {
+        console.error("Error fetching game state", error);
+      }
+    }
+
+    fetchState();
+    const intervalId = setInterval(fetchState, 100);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   const resetGame = async () => {
